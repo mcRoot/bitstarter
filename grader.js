@@ -37,7 +37,18 @@ var assertFileExists = function(infile) {
 };
 
 var cheerioHtmlFile = function(htmlfile) {
-    return cheerio.load(fs.readFileSync(htmlfile));
+    	var result;
+	if(htmlfile.indexOf("http")>=0){
+		rest.get(htmlfile).on('complete', function(result) {
+    		if (result instanceof Error) {
+    			sys.puts('Error: ' + result.message);
+    			this.retry(5000); // try again after 5 sec
+    		} else {
+    			sys.puts(result);
+    		}
+    		});
+	}else result = cheerio.load(fs.readFileSync(htmlfile));
+	return result;
 };
 
 var loadChecks = function(checksfile) {
